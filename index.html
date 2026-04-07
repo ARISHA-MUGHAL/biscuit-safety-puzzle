@@ -1,188 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EBM Safety Puzzle</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 30px 15px;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f7efe3;
-      color: #4a2f1b;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EBM Safety Biscuit Puzzle</title>
 
-    h1 {
-      margin-bottom: 10px;
-      font-size: 32px;
-    }
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    p {
-      margin-bottom: 20px;
-      color: #6b4a2f;
-    }
+<style>
 
-    .tray,
-    .answer {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin: 20px auto;
-      min-height: 100px;
-    }
+body{
+font-family:Arial;
+background:#f6efe6;
+text-align:center;
+padding:20px;
+}
 
-    .tile {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(145deg, #d9a15f, #c88745);
-      border-radius: 18px;
-      border: 3px solid #ebc99f;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
-      color: #fff9f0;
-      font-size: 30px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: grab;
-      user-select: none;
-      position: relative;
-    }
+h1{
+color:#3c2b20;
+}
 
-    .tile::before {
-      content: "";
-      position: absolute;
-      inset: 8px;
-      border: 2px dashed rgba(255, 255, 255, 0.18);
-      border-radius: 12px;
-    }
+#game{
+max-width:500px;
+margin:auto;
+}
 
-    .slot {
-      width: 80px;
-      height: 80px;
-      background: #fff8ef;
-      border: 3px dashed #c7a07a;
-      border-radius: 18px;
-      box-shadow: inset 0 3px 8px rgba(0,0,0,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+#tray{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:10px;
+margin:20px 0;
+}
 
-    button {
-      margin-top: 15px;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 30px;
-      background: #b86f2f;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.tile{
+width:70px;
+height:70px;
+background:#d8a15e;
+border-radius:20px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:26px;
+font-weight:bold;
+color:white;
+cursor:pointer;
+box-shadow:0 6px 10px rgba(0,0,0,0.2);
+}
 
-    button:hover {
-      background: #9f5f27;
-    }
+.slot{
+width:70px;
+height:70px;
+border:2px dashed #caa37d;
+border-radius:20px;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+margin:5px;
+}
 
-    #message {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+#slots{
+margin:15px 0;
+}
 
-    .hint {
-      font-size: 14px;
-      color: #7a5a40;
-      margin-top: 10px;
-    }
-  </style>
+button{
+background:#b87333;
+border:none;
+padding:12px 20px;
+color:white;
+border-radius:30px;
+font-size:16px;
+cursor:pointer;
+margin-top:10px;
+}
+
+#info{
+margin-top:10px;
+font-weight:bold;
+}
+
+</style>
 </head>
+
 <body>
 
-  <h1>🍪 EBM Safety Puzzle</h1>
-  <p>Drag the biscuit tiles into the empty boxes to make the correct word.</p>
-  <p><strong>Hint:</strong> A key ingredient of psychological safety</p>
+<h1>🍪 EBM Safety Biscuit Puzzle</h1>
 
-  <div class="tray" id="tray">
-    <div class="tile" draggable="true" id="tile1">S</div>
-    <div class="tile" draggable="true" id="tile2">R</div>
-    <div class="tile" draggable="true" id="tile3">U</div>
-    <div class="tile" draggable="true" id="tile4">T</div>
-    <div class="tile" draggable="true" id="tile5">T</div>
-  </div>
+<div id="game">
 
-  <div class="answer">
-    <div class="slot" data-letter=""></div>
-    <div class="slot" data-letter=""></div>
-    <div class="slot" data-letter=""></div>
-    <div class="slot" data-letter=""></div>
-    <div class="slot" data-letter=""></div>
-  </div>
+<div id="info">
+Puzzle: <span id="level">1</span>/10 |
+Score: <span id="score">0</span> |
+Time: <span id="time">0</span>s
+</div>
 
-  <button onclick="checkAnswer()">Check Answer</button>
+<div id="slots"></div>
 
-  <div id="message"></div>
-  <div class="hint">Correct word: TRUST</div>
+<div id="tray"></div>
 
-  <script>
-    const tiles = document.querySelectorAll('.tile');
-    const slots = document.querySelectorAll('.slot');
-    const tray = document.getElementById('tray');
-    let draggedTile = null;
+<button onclick="checkWord()">Check</button>
 
-    tiles.forEach(tile => {
-      tile.addEventListener('dragstart', () => {
-        draggedTile = tile;
-      });
-    });
+<div id="message"></div>
 
-    slots.forEach(slot => {
-      slot.addEventListener('dragover', e => {
-        e.preventDefault();
-      });
+</div>
 
-      slot.addEventListener('drop', e => {
-        e.preventDefault();
+<script>
 
-        if (!slot.hasChildNodes()) {
-          slot.appendChild(draggedTile);
-        }
-      });
-    });
+const words=[
+"TRUST",
+"CALM",
+"CARE",
+"BALANCE",
+"SUPPORT",
+"RESPECT",
+"SAFETY",
+"FOCUS",
+"TEAM",
+"LISTEN"
+]
 
-    tray.addEventListener('dragover', e => {
-      e.preventDefault();
-    });
+let level=0
+let score=0
+let timer=0
+let interval
 
-    tray.addEventListener('drop', e => {
-      e.preventDefault();
-      tray.appendChild(draggedTile);
-    });
+function startTimer(){
+interval=setInterval(()=>{
+timer++
+document.getElementById("time").innerText=timer
+},1000)
+}
 
-    function checkAnswer() {
-      let word = "";
+function loadPuzzle(){
 
-      slots.forEach(slot => {
-        if (slot.firstChild) {
-          word += slot.firstChild.textContent;
-        }
-      });
+clearInterval(interval)
+timer=0
+document.getElementById("time").innerText=0
+startTimer()
 
-      const message = document.getElementById("message");
+let word=words[level]
 
-      if (word === "TRUST") {
-        message.innerHTML = "🎉 Great job! TRUST is one of the key ingredients of psychological safety.";
-        message.style.color = "green";
-      } else {
-        message.innerHTML = "❌ Not quite. Try again.";
-        message.style.color = "crimson";
-      }
-    }
-  </script>
+document.getElementById("level").innerText=level+1
+
+let slotsHTML=""
+for(let i=0;i<word.length;i++){
+slotsHTML+=`<div class="slot" data-index="${i}"></div>`
+}
+document.getElementById("slots").innerHTML=slotsHTML
+
+let shuffled=word.split("").sort(()=>Math.random()-0.5)
+
+let trayHTML=""
+shuffled.forEach(letter=>{
+trayHTML+=`<div class="tile">${letter}</div>`
+})
+
+document.getElementById("tray").innerHTML=trayHTML
+
+enableDrag()
+
+}
+
+function enableDrag(){
+
+let tiles=document.querySelectorAll(".tile")
+let slots=document.querySelectorAll(".slot")
+
+tiles.forEach(tile=>{
+tile.draggable=true
+
+tile.addEventListener("dragstart",e=>{
+e.dataTransfer.setData("text",tile.innerText)
+tile.classList.add("dragging")
+})
+
+})
+
+slots.forEach(slot=>{
+
+slot.addEventListener("dragover",e=>{
+e.preventDefault()
+})
+
+slot.addEventListener("drop",e=>{
+e.preventDefault()
+let letter=e.dataTransfer.getData("text")
+
+if(slot.innerText===""){
+slot.innerText=letter
+}
+})
+
+})
+
+}
+
+function checkWord(){
+
+let slots=document.querySelectorAll(".slot")
+
+let word=""
+slots.forEach(s=>{
+word+=s.innerText
+})
+
+if(word===words[level]){
+
+score+=10
+document.getElementById("score").innerText=score
+
+confetti({
+particleCount:150,
+spread:70,
+origin:{y:0.6}
+})
+
+document.getElementById("message").innerText="Great! Correct word."
+
+level++
+
+if(level<words.length){
+setTimeout(loadPuzzle,1200)
+}else{
+document.getElementById("message").innerText="🎉 You completed the Safety Recipe!"
+}
+
+}else{
+
+document.getElementById("message").innerText="Try again."
+
+}
+
+}
+
+loadPuzzle()
+
+</script>
 
 </body>
 </html>
