@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EBM Safety Puzzle</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 30px 15px;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f7efe3;
+      color: #4a2f1b;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    p {
+      margin-bottom: 20px;
+      color: #6b4a2f;
+    }
+
+    .tray,
+    .answer {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 20px auto;
+      min-height: 100px;
+    }
+
+    .tile {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(145deg, #d9a15f, #c88745);
+      border-radius: 18px;
+      border: 3px solid #ebc99f;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
+      color: #fff9f0;
+      font-size: 30px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+      position: relative;
+    }
+
+    .tile::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 2px dashed rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+    }
+
+    .slot {
+      width: 80px;
+      height: 80px;
+      background: #fff8ef;
+      border: 3px dashed #c7a07a;
+      border-radius: 18px;
+      box-shadow: inset 0 3px 8px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 30px;
+      background: #b86f2f;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #9f5f27;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .hint {
+      font-size: 14px;
+      color: #7a5a40;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🍪 EBM Safety Puzzle</h1>
+  <p>Drag the biscuit tiles into the empty boxes to make the correct word.</p>
+  <p><strong>Hint:</strong> A key ingredient of psychological safety</p>
+
+  <div class="tray" id="tray">
+    <div class="tile" draggable="true" id="tile1">S</div>
+    <div class="tile" draggable="true" id="tile2">R</div>
+    <div class="tile" draggable="true" id="tile3">U</div>
+    <div class="tile" draggable="true" id="tile4">T</div>
+    <div class="tile" draggable="true" id="tile5">T</div>
+  </div>
+
+  <div class="answer">
+    <div class="slot" data-letter=""></div>
+    <div class="slot" data-letter=""></div>
+    <div class="slot" data-letter=""></div>
+    <div class="slot" data-letter=""></div>
+    <div class="slot" data-letter=""></div>
+  </div>
+
+  <button onclick="checkAnswer()">Check Answer</button>
+
+  <div id="message"></div>
+  <div class="hint">Correct word: TRUST</div>
+
+  <script>
+    const tiles = document.querySelectorAll('.tile');
+    const slots = document.querySelectorAll('.slot');
+    const tray = document.getElementById('tray');
+    let draggedTile = null;
+
+    tiles.forEach(tile => {
+      tile.addEventListener('dragstart', () => {
+        draggedTile = tile;
+      });
+    });
+
+    slots.forEach(slot => {
+      slot.addEventListener('dragover', e => {
+        e.preventDefault();
+      });
+
+      slot.addEventListener('drop', e => {
+        e.preventDefault();
+
+        if (!slot.hasChildNodes()) {
+          slot.appendChild(draggedTile);
+        }
+      });
+    });
+
+    tray.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+
+    tray.addEventListener('drop', e => {
+      e.preventDefault();
+      tray.appendChild(draggedTile);
+    });
+
+    function checkAnswer() {
+      let word = "";
+
+      slots.forEach(slot => {
+        if (slot.firstChild) {
+          word += slot.firstChild.textContent;
+        }
+      });
+
+      const message = document.getElementById("message");
+
+      if (word === "TRUST") {
+        message.innerHTML = "🎉 Great job! TRUST is one of the key ingredients of psychological safety.";
+        message.style.color = "green";
+      } else {
+        message.innerHTML = "❌ Not quite. Try again.";
+        message.style.color = "crimson";
+      }
+    }
+  </script>
+
+</body>
+</html>
