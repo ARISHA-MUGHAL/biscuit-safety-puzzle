@@ -10,7 +10,7 @@
             --bg-color: #f7ede2;
             --primary-brown: #5d4037;
             --rio-top: #e3a857;
-            --rio-dark: #3e2723; /* Chocolate center */
+            --rio-dark: #3e2723; 
             --accent: #d84315;
             --shadow: rgba(0,0,0,0.15);
         }
@@ -29,10 +29,9 @@
             height: 100vh;
         }
 
-        /* --- Header & Stats --- */
         #header {
             width: 100%;
-            padding: 15px 25px;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -42,400 +41,301 @@
         }
 
         .stat-box { text-align: center; }
-        .stat-label { font-size: 0.7rem; color: #8d6e63; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-value { font-size: 1.2rem; font-family: 'Fredoka One', cursive; color: var(--primary-brown); }
+        .stat-label { font-size: 0.6rem; color: #8d6e63; text-transform: uppercase; }
+        .stat-value { font-size: 1.1rem; font-family: 'Fredoka One', cursive; color: var(--primary-brown); }
 
         #game-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
+            padding: 10px;
         }
 
-        h1 { font-family: 'Fredoka One', cursive; color: var(--primary-brown); margin-bottom: 5px; text-shadow: 2px 2px 0 #fff; }
+        h1 { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--primary-brown); margin-top: 10px; text-align: center; }
 
-        /* --- Puzzle Board --- */
         #slot-container {
             display: flex;
-            gap: 12px;
-            margin: 40px 0;
-            min-height: 85px;
+            gap: 10px;
+            margin: 30px 0;
+            min-height: 75px;
             justify-content: center;
             flex-wrap: wrap;
+            width: 100%;
         }
 
         .slot {
-            width: 80px;
-            height: 80px;
+            width: 65px;
+            height: 65px;
             border: 3px dashed rgba(93, 64, 55, 0.2);
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.3);
         }
 
-        #tile-container {
-            position: relative;
+        #tile-area {
+            flex: 1;
             width: 100%;
-            max-width: 600px;
-            height: 200px;
-            margin-top: 20px;
+            position: relative;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
         }
 
-        /* --- RIO BISCUIT STYLE --- */
         .biscuit {
-            width: 80px;
-            height: 80px;
+            width: 65px;
+            height: 65px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Fredoka One', cursive;
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             color: rgba(62, 39, 35, 0.7);
             cursor: grab;
             position: absolute;
             user-select: none;
-            
-            /* Biscuit Texture & Layers */
             background: var(--rio-top);
-            border-radius: 12px;
-            box-shadow: 
-                0 4px 0 #c6934b, /* Side edge */
-                0 6px 10px rgba(0,0,0,0.3); /* Drop shadow */
+            border-radius: 10px;
+            box-shadow: 0 4px 0 #c6934b, 0 6px 10px rgba(0,0,0,0.2);
             border: 1px solid #c6934b;
+            z-index: 10;
         }
 
-        /* Chocolate Holes Pattern */
         .biscuit::before {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(var(--rio-dark) 20%, transparent 25%),
-                radial-gradient(var(--rio-dark) 20%, transparent 25%);
-            background-size: 24px 24px;
-            background-position: 8px 8px, 20px 20px;
-            opacity: 0.4;
+            background-image: radial-gradient(var(--rio-dark) 20%, transparent 25%);
+            background-size: 18px 18px;
+            background-position: 5px 5px;
+            opacity: 0.3;
             pointer-events: none;
         }
 
-        /* Surface Roughness */
-        .biscuit::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/sandpaper.png');
-            opacity: 0.1;
-            pointer-events: none;
-        }
-
-        .biscuit:active { cursor: grabbing; transform: scale(1.05); z-index: 1000; }
-
-        /* --- Overlays --- */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(62, 39, 35, 0.85);
+            background: rgba(62, 39, 35, 0.9);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 2000;
             padding: 20px;
-            backdrop-filter: blur(4px);
         }
 
         .modal {
             background: #fff;
-            padding: 40px;
-            border-radius: 30px;
-            max-width: 450px;
+            padding: 30px;
+            border-radius: 25px;
+            max-width: 400px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            border-bottom: 8px solid var(--rio-top);
         }
 
         .btn {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 15px 35px;
-            font-size: 1.1rem;
+            padding: 12px 25px;
             font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
-            margin-top: 25px;
-            transition: 0.3s;
-            box-shadow: 0 4px 0 #bf360c;
-        }
-
-        .btn:active { transform: translateY(3px); box-shadow: none; }
-
-        input {
-            padding: 12px;
-            width: 90%;
-            border: 2px solid #ddd;
-            border-radius: 12px;
             margin-top: 15px;
-            font-family: inherit;
-            font-size: 1.1rem;
-            text-align: center;
-        }
-
-        canvas#confetti {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 1500;
         }
     </style>
 </head>
 <body>
 
-    <canvas id="confetti"></canvas>
-
     <div id="header">
-        <div class="stat-box">
-            <div class="stat-label">Ingredient</div>
-            <div class="stat-value" id="puzzle-count">1 / 10</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-label">Safety Score</div>
-            <div class="stat-value" id="score">0</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-label">Timer</div>
-            <div class="stat-value" id="timer">0s</div>
-        </div>
-        <button class="btn" style="padding: 5px 15px; margin: 0; font-size: 0.8rem;" onclick="loadPuzzle()">Shuffle</button>
+        <div class="stat-box"><div class="stat-label">Ingredient</div><div class="stat-value" id="puzzle-count">1/10</div></div>
+        <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+        <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="timer">0s</div></div>
+        <button class="btn" style="margin:0; padding: 5px 12px;" onclick="loadPuzzle()">Reset</button>
     </div>
 
     <div id="game-container">
         <h1>Safe Minds Bake Safe Workplaces</h1>
-        <p>Drag the biscuit tiles to complete the recipe</p>
-
         <div id="slot-container"></div>
-        <div id="tile-container"></div>
+        <div id="tile-area"></div>
     </div>
 
     <div id="start-overlay" class="overlay" style="display: flex;">
         <div class="modal">
-            <h2 style="font-family: 'Fredoka One'; font-size: 2rem;">World Safety Day 2026</h2>
-            <p style="margin: 15px 0;">Psychological safety is the secret ingredient to a great workplace. Are you ready to bake?</p>
-            <input type="text" id="player-name" placeholder="Enter Employee Name" maxlength="15">
-            <button class="btn" onclick="startGame()">Start Game</button>
+            <h2>Welcome Baker!</h2>
+            <p>Ready to bake psychological safety?</p>
+            <button class="btn" onclick="startGame()">Start Baking</button>
         </div>
     </div>
 
     <div id="info-overlay" class="overlay">
         <div class="modal">
-            <div style="font-size: 3rem; margin-bottom: 10px;">🍪</div>
-            <h2 id="info-title" style="font-family: 'Fredoka One'; color: var(--accent);"></h2>
-            <p id="info-text" style="margin: 20px 0; line-height: 1.6; font-size: 1.1rem;"></p>
+            <h2 id="info-title"></h2>
+            <p id="info-text" style="margin: 15px 0;"></p>
             <button class="btn" onclick="nextPuzzle()">Next Ingredient</button>
-        </div>
-    </div>
-
-    <div id="end-overlay" class="overlay">
-        <div class="modal">
-            <h2 style="font-family: 'Fredoka One'; font-size: 2.2rem;">Master Baker! 🎉</h2>
-            <p>You have completed the full Recipe for Psychological Safety.</p>
-            <div id="final-stats" style="margin: 20px 0; padding: 15px; background: #fff3e0; border-radius: 15px; font-weight: bold;"></div>
-            <button class="btn" onclick="location.reload()">New Shift (Restart)</button>
         </div>
     </div>
 
     <script>
         const PUZZLES = [
-            { word: "TRUST", info: "Trust allows employees to speak up, share ideas, and report hazards without fear." },
-            { word: "CARE", info: "When people care about each other, safety becomes a shared responsibility." },
-            { word: "CALM", info: "A calm mind identifies risks better than a stressed one." },
-            { word: "TEAM", info: "Strong teams support one another and create safer workplaces." },
-            { word: "FOCUS", info: "Concentration on the task at hand prevents accidental errors." },
-            { word: "LISTEN", info: "Active listening ensures that safety concerns are heard and acted upon." },
-            { word: "RESPECT", info: "Respect encourages open communication and psychological safety." },
-            { word: "SUPPORT", info: "Helping colleagues in difficult times builds a resilient safety culture." },
-            { word: "BALANCE", info: "Work-life balance prevents burnout, keeping employees alert and safe." },
-            { word: "SAFETY", info: "Safety is not just a rule—it's a mindset we bake into every single day." }
+            { word: "TRUST", info: "Trust allows employees to speak up and report hazards without fear." },
+            { word: "CARE", info: "When people care, safety becomes a shared responsibility." },
+            { word: "TEAM", info: "Strong teams support one another for a safer workplace." },
+            { word: "FOCUS", info: "Concentration prevents accidental errors." }
         ];
 
         let currentIdx = 0;
         let score = 0;
         let startTime;
-        let timerInterval;
-        let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioCtx;
 
-        function playTone(freq, type, duration, vol=0.1) {
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(freq, type, dur) {
+            initAudio();
             const osc = audioCtx.createOscillator();
             const g = audioCtx.createGain();
             osc.type = type;
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            g.gain.setValueAtTime(vol, audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
             osc.connect(g); g.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + dur);
         }
 
         function startGame() {
-            const name = document.getElementById('player-name').value;
-            if(!name) return alert("Please enter your name!");
+            initAudio();
             document.getElementById('start-overlay').style.display = 'none';
             startTime = Date.now();
-            timerInterval = setInterval(() => {
+            setInterval(() => {
                 document.getElementById('timer').innerText = Math.floor((Date.now()-startTime)/1000) + 's';
             }, 1000);
             loadPuzzle();
         }
 
         function loadPuzzle() {
-            const puzzle = PUZZLES[currentIdx];
-            document.getElementById('puzzle-count').innerText = `${currentIdx + 1} / ${PUZZLES.length}`;
-            
+            const p = PUZZLES[currentIdx];
+            document.getElementById('puzzle-count').innerText = `${currentIdx + 1}/${PUZZLES.length}`;
             const sCont = document.getElementById('slot-container');
-            const tCont = document.getElementById('tile-container');
+            const tArea = document.getElementById('tile-area');
             sCont.innerHTML = '';
-            tCont.innerHTML = '';
+            tArea.innerHTML = '';
 
-            const letters = puzzle.word.split('');
-            
-            // Create target slots
-            letters.forEach((_, i) => {
-                const slot = document.createElement('div');
-                slot.className = 'slot';
-                slot.dataset.index = i;
-                sCont.appendChild(slot);
+            // Create Slots
+            p.word.split('').forEach((_, i) => {
+                const s = document.createElement('div');
+                s.className = 'slot';
+                s.dataset.index = i;
+                sCont.appendChild(s);
             });
 
-            // Create biscuit tiles - ensuring ALL letters are present
+            // Create Biscuits in a Neat Grid (No Overlap)
+            const letters = p.word.split('').sort(() => Math.random() - 0.5);
+            const cols = 3;
+            const gap = 80;
+            
             letters.forEach((char, i) => {
-                const tile = document.createElement('div');
-                tile.className = 'biscuit';
-                tile.innerText = char;
-                tile.dataset.letter = char;
-                tile.dataset.id = i; // Unique ID per tile
+                const t = document.createElement('div');
+                t.className = 'biscuit';
+                t.innerText = char;
+                t.dataset.letter = char;
                 
-                // Randomly scatter tiles in the lower area
-                const randomX = Math.random() * (tCont.offsetWidth - 80);
-                const randomY = Math.random() * (tCont.offsetHeight - 80);
-                tile.style.left = randomX + 'px';
-                tile.style.top = randomY + 'px';
+                // Position in grid
+                const r = Math.floor(i / cols);
+                const c = i % cols;
+                t.style.left = (20 + (c * gap)) + 'px';
+                t.style.top = (20 + (r * gap)) + 'px';
                 
-                attachDrag(tile);
-                tCont.appendChild(tile);
+                attachDrag(t);
+                tArea.appendChild(t);
             });
         }
 
         function attachDrag(el) {
-            let startX, startY, initialLeft, initialTop;
+            let offsetX, offsetY;
 
-            const onStart = (e) => {
-                const touch = e.type === 'touchstart' ? e.touches[0] : e;
-                startX = touch.clientX;
-                startY = touch.clientY;
-                initialLeft = el.offsetLeft;
-                initialTop = el.offsetTop;
-                el.style.zIndex = 1000;
-                
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('touchmove', onMove, {passive: false});
-                document.addEventListener('mouseup', onEnd);
-                document.addEventListener('touchend', onEnd);
+            const move = (e) => {
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                el.style.left = (clientX - offsetX) + 'px';
+                el.style.top = (clientY - offsetY) + 'px';
             };
 
-            const onMove = (e) => {
-                e.preventDefault();
-                const touch = e.type === 'touchmove' ? e.touches[0] : e;
-                el.style.left = (initialLeft + (touch.clientX - startX)) + 'px';
-                el.style.top = (initialTop + (touch.clientY - startY)) + 'px';
-            };
-
-            const onEnd = () => {
-                document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('touchmove', onMove);
+            const stop = (e) => {
+                document.removeEventListener('mousemove', move);
+                document.removeEventListener('touchmove', move);
                 
                 const slots = document.querySelectorAll('.slot');
                 let snapped = false;
 
                 slots.forEach(slot => {
-                    const sR = slot.getBoundingClientRect();
-                    const tR = el.getBoundingClientRect();
-                    const centerX = tR.left + 40;
-                    const centerY = tR.top + 40;
+                    const sRect = slot.getBoundingClientRect();
+                    const tRect = el.getBoundingClientRect();
+                    
+                    // Check if biscuit center is over slot
+                    const tCenterX = tRect.left + tRect.width/2;
+                    const tCenterY = tRect.top + tRect.height/2;
 
-                    if(centerX > sR.left && centerX < sR.right && centerY > sR.top && centerY < sR.bottom) {
-                        el.style.left = slot.offsetLeft + 'px';
-                        el.style.top = (slot.offsetTop + document.getElementById('slot-container').offsetTop) + 'px';
-                        el.dataset.currentSlot = slot.dataset.index;
+                    if (tCenterX > sRect.left && tCenterX < sRect.right && 
+                        tCenterY > sRect.top && tCenterY < sRect.bottom) {
+                        
+                        // SNAP TO CENTER
+                        const areaRect = document.getElementById('tile-area').getBoundingClientRect();
+                        el.style.left = (sRect.left - areaRect.left) + 'px';
+                        el.style.top = (sRect.top - areaRect.top) + 'px';
+                        el.dataset.slotIdx = slot.dataset.index;
                         snapped = true;
-                        playTone(200, 'sine', 0.1);
+                        playSound(400, 'sine', 0.1); // Drop Sound
                     }
                 });
 
-                if(!snapped) el.dataset.currentSlot = -1;
-                el.style.zIndex = 10;
-                checkWin();
+                if(!snapped) el.dataset.slotIdx = -1;
+                checkWord();
             };
 
-            el.addEventListener('mousedown', onStart);
-            el.addEventListener('touchstart', onStart);
+            const start = (e) => {
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const rect = el.getBoundingClientRect();
+                offsetX = clientX - rect.left;
+                offsetY = clientY - rect.top;
+                el.style.zIndex = 1000;
+                document.addEventListener('mousemove', move);
+                document.addEventListener('touchmove', move, {passive: false});
+                document.addEventListener('mouseup', stop);
+                document.addEventListener('touchend', stop);
+            };
+
+            el.addEventListener('mousedown', start);
+            el.addEventListener('touchstart', start);
         }
 
-        function checkWin() {
+        function checkWord() {
             const word = PUZZLES[currentIdx].word;
             const tiles = document.querySelectorAll('.biscuit');
-            let currentString = new Array(word.length).fill('_');
+            let currentStr = new Array(word.length).fill('_');
 
             tiles.forEach(t => {
-                const idx = parseInt(t.dataset.currentSlot);
-                if(idx >= 0) currentString[idx] = t.dataset.letter;
+                const idx = parseInt(t.dataset.slotIdx);
+                if(idx >= 0) currentStr[idx] = t.dataset.letter;
             });
 
-            if(currentString.join('') === word) {
-                score += 10;
-                document.getElementById('score').innerText = score;
-                playTone(500, 'triangle', 0.2);
-                setTimeout(showSuccess, 500);
+            if(currentStr.join('') === word) {
+                playSound(600, 'triangle', 0.3); // Win Sound
+                setTimeout(() => {
+                    const p = PUZZLES[currentIdx];
+                    document.getElementById('info-title').innerText = p.word;
+                    document.getElementById('info-text').innerText = p.info;
+                    document.getElementById('info-overlay').style.display = 'flex';
+                }, 400);
             }
-        }
-
-        function showSuccess() {
-            confetti();
-            const p = PUZZLES[currentIdx];
-            document.getElementById('info-title').innerText = p.word;
-            document.getElementById('info-text').innerText = p.info;
-            document.getElementById('info-overlay').style.display = 'flex';
         }
 
         function nextPuzzle() {
             document.getElementById('info-overlay').style.display = 'none';
             currentIdx++;
             if(currentIdx < PUZZLES.length) loadPuzzle();
-            else showEnd();
-        }
-
-        function showEnd() {
-            clearInterval(timerInterval);
-            document.getElementById('final-stats').innerText = `Final Score: ${score} | Total Time: ${document.getElementById('timer').innerText}`;
-            document.getElementById('end-overlay').style.display = 'flex';
-        }
-
-        // Simple Canvas Confetti
-        function confetti() {
-            const c = document.getElementById('confetti');
-            const ctx = c.getContext('2d');
-            c.width = window.innerWidth; c.height = window.innerHeight;
-            let parts = Array.from({length: 80}, () => ({
-                x: Math.random()*c.width, y: -20, 
-                s: Math.random()*10+5, c: `hsl(${Math.random()*360}, 70%, 50%)`,
-                v: Math.random()*3+2
-            }));
-            function draw() {
-                ctx.clearRect(0,0,c.width,c.height);
-                parts.forEach(p => { p.y += p.v; ctx.fillStyle=p.c; ctx.fillRect(p.x,p.y,p.s,p.s); });
-                if(parts[0].y < c.height) requestAnimationFrame(draw);
-            }
-            draw();
+            else alert("Campaign Complete! You are a Safety Master!");
         }
     </script>
 </body>
