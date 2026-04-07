@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Safety Biscuit Puzzle - World Safety Day 2026</title>
+    <title>Safety Biscuit Puzzle - 2026 Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #fdf5e6;
-            --primary-brown: #8b4513;
-            --biscuit-gold: #e3a857;
-            --biscuit-dark: #c17b3a;
-            --cream: #fff5ba;
-            --accent: #ff6b6b;
-            --shadow: rgba(0,0,0,0.1);
+            --bg-color: #f7ede2;
+            --primary-brown: #5d4037;
+            --rio-top: #e3a857;
+            --rio-dark: #3e2723; /* Chocolate center */
+            --accent: #d84315;
+            --shadow: rgba(0,0,0,0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
@@ -21,215 +20,174 @@
         body {
             font-family: 'Quicksand', sans-serif;
             background-color: var(--bg-color);
-            background-image: radial-gradient(var(--shadow) 1px, transparent 1px);
-            background-size: 30px 30px;
+            background-image: radial-gradient(#d7ccc8 1px, transparent 1px);
+            background-size: 25px 25px;
             color: var(--primary-brown);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
             height: 100vh;
         }
 
-        /* --- UI Elements --- */
+        /* --- Header & Stats --- */
         #header {
             width: 100%;
             padding: 15px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(5px);
-            box-shadow: 0 4px 10px var(--shadow);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px var(--shadow);
             z-index: 100;
         }
 
-        .stat-box { text-align: center; font-weight: 700; }
-        .stat-label { font-size: 0.8rem; color: #a0522d; text-transform: uppercase; }
-        .stat-value { font-size: 1.4rem; color: var(--primary-brown); font-family: 'Fredoka One', cursive; }
+        .stat-box { text-align: center; }
+        .stat-label { font-size: 0.7rem; color: #8d6e63; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 1.2rem; font-family: 'Fredoka One', cursive; color: var(--primary-brown); }
 
         #game-container {
             flex: 1;
-            width: 100%;
-            max-width: 800px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             padding: 20px;
             position: relative;
         }
 
-        h1 {
-            font-family: 'Fredoka One', cursive;
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-            text-align: center;
-            color: var(--primary-brown);
-        }
-
-        .tagline { font-weight: 500; margin-bottom: 30px; opacity: 0.8; }
+        h1 { font-family: 'Fredoka One', cursive; color: var(--primary-brown); margin-bottom: 5px; text-shadow: 2px 2px 0 #fff; }
 
         /* --- Puzzle Board --- */
         #slot-container {
             display: flex;
-            gap: 15px;
-            margin-bottom: 50px;
-            min-height: 100px;
+            gap: 12px;
+            margin: 40px 0;
+            min-height: 85px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .slot {
-            width: 70px;
-            height: 70px;
-            border: 3px dashed rgba(139, 69, 19, 0.2);
+            width: 80px;
+            height: 80px;
+            border: 3px dashed rgba(93, 64, 55, 0.2);
             border-radius: 12px;
-            position: relative;
+            background: rgba(255, 255, 255, 0.3);
         }
 
         #tile-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 20px;
+            position: relative;
             width: 100%;
+            max-width: 600px;
+            height: 200px;
+            margin-top: 20px;
         }
 
-        /* --- Biscuit Styling --- */
+        /* --- RIO BISCUIT STYLE --- */
         .biscuit {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Fredoka One', cursive;
-            font-size: 2rem;
-            color: rgba(0,0,0,0.5);
+            font-size: 2.2rem;
+            color: rgba(62, 39, 35, 0.7);
             cursor: grab;
+            position: absolute;
             user-select: none;
-            position: absolute;
-            transition: transform 0.1s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 10;
+            
+            /* Biscuit Texture & Layers */
+            background: var(--rio-top);
+            border-radius: 12px;
+            box-shadow: 
+                0 4px 0 #c6934b, /* Side edge */
+                0 6px 10px rgba(0,0,0,0.3); /* Drop shadow */
+            border: 1px solid #c6934b;
         }
 
-        .biscuit:active { cursor: grabbing; transform: scale(1.1); z-index: 100; }
-
-        /* Style 1: Rio (Square, Dotted) */
-        .type-rio {
-            background: var(--biscuit-gold);
-            border-radius: 8px;
-            border: 4px solid var(--biscuit-dark);
-            box-shadow: inset 0 0 10px var(--biscuit-dark);
-        }
-        .type-rio::after {
-            content: "• • •\n• • •\n• • •";
-            position: absolute;
-            font-size: 10px;
-            line-height: 12px;
-            opacity: 0.3;
-            white-space: pre;
-        }
-
-        /* Style 2: Click (Round) */
-        .type-click {
-            background: #f4c582;
-            border-radius: 50%;
-            border: 3px solid #b8860b;
-        }
-        .type-click::before {
+        /* Chocolate Holes Pattern */
+        .biscuit::before {
             content: '';
             position: absolute;
-            width: 80%; height: 80%;
-            border: 1px dashed rgba(0,0,0,0.1);
-            border-radius: 50%;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(var(--rio-dark) 20%, transparent 25%),
+                radial-gradient(var(--rio-dark) 20%, transparent 25%);
+            background-size: 24px 24px;
+            background-position: 8px 8px, 20px 20px;
+            opacity: 0.4;
+            pointer-events: none;
         }
 
-        /* Style 3: Sooper (Striped) */
-        .type-sooper {
-            background: repeating-linear-gradient(45deg, #e3a857, #e3a857 5px, #d49a4a 5px, #d49a4a 10px);
-            border-radius: 4px;
-            border: 2px solid var(--primary-brown);
+        /* Surface Roughness */
+        .biscuit::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/sandpaper.png');
+            opacity: 0.1;
+            pointer-events: none;
         }
 
-        /* Style 4: Lemon Sandwich */
-        .type-lemon {
-            background: var(--biscuit-gold);
-            border-radius: 10px;
-            border-bottom: 6px solid var(--cream);
-            border-top: 2px solid var(--biscuit-dark);
-        }
+        .biscuit:active { cursor: grabbing; transform: scale(1.05); z-index: 1000; }
 
-        /* --- Modals --- */
+        /* --- Overlays --- */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(62, 39, 35, 0.85);
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 2000;
             padding: 20px;
+            backdrop-filter: blur(4px);
         }
 
         .modal {
-            background: white;
+            background: #fff;
             padding: 40px;
-            border-radius: 24px;
-            max-width: 500px;
+            border-radius: 30px;
+            max-width: 450px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-bottom: 8px solid var(--rio-top);
         }
 
         .btn {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 12px 30px;
+            padding: 15px 35px;
             font-size: 1.1rem;
             font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
-            margin-top: 20px;
-            transition: 0.2s;
+            margin-top: 25px;
+            transition: 0.3s;
+            box-shadow: 0 4px 0 #bf360c;
         }
 
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4); }
+        .btn:active { transform: translateY(3px); box-shadow: none; }
 
-        #leaderboard-table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-
-        #leaderboard-table th, #leaderboard-table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+        input {
+            padding: 12px;
+            width: 90%;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-family: inherit;
+            font-size: 1.1rem;
+            text-align: center;
         }
 
         canvas#confetti {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
-            z-index: 999;
-        }
-
-        input {
-            padding: 10px;
-            width: 80%;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 1rem;
+            z-index: 1500;
         }
     </style>
 </head>
@@ -239,22 +197,23 @@
 
     <div id="header">
         <div class="stat-box">
-            <div class="stat-label">Puzzle</div>
+            <div class="stat-label">Ingredient</div>
             <div class="stat-value" id="puzzle-count">1 / 10</div>
         </div>
         <div class="stat-box">
-            <div class="stat-label">Score</div>
+            <div class="stat-label">Safety Score</div>
             <div class="stat-value" id="score">0</div>
         </div>
         <div class="stat-box">
-            <div class="stat-label">Time</div>
+            <div class="stat-label">Timer</div>
             <div class="stat-value" id="timer">0s</div>
         </div>
+        <button class="btn" style="padding: 5px 15px; margin: 0; font-size: 0.8rem;" onclick="loadPuzzle()">Shuffle</button>
     </div>
 
     <div id="game-container">
         <h1>Safe Minds Bake Safe Workplaces</h1>
-        <p class="tagline">Assemble the ingredients for psychological safety</p>
+        <p>Drag the biscuit tiles to complete the recipe</p>
 
         <div id="slot-container"></div>
         <div id="tile-container"></div>
@@ -262,277 +221,222 @@
 
     <div id="start-overlay" class="overlay" style="display: flex;">
         <div class="modal">
-            <h2>Welcome, Baker! 🍪</h2>
-            <p style="margin: 15px 0;">Help us bake the perfect workplace. Enter your name to start the World Safety Day 2026 Challenge.</p>
-            <input type="text" id="player-name" placeholder="Your Name" maxlength="15">
-            <button class="btn" onclick="startGame()">Start Baking</button>
+            <h2 style="font-family: 'Fredoka One'; font-size: 2rem;">World Safety Day 2026</h2>
+            <p style="margin: 15px 0;">Psychological safety is the secret ingredient to a great workplace. Are you ready to bake?</p>
+            <input type="text" id="player-name" placeholder="Enter Employee Name" maxlength="15">
+            <button class="btn" onclick="startGame()">Start Game</button>
         </div>
     </div>
 
     <div id="info-overlay" class="overlay">
         <div class="modal">
-            <h2 id="info-title">TRUST</h2>
-            <p id="info-text" style="margin: 20px 0; line-height: 1.6;"></p>
+            <div style="font-size: 3rem; margin-bottom: 10px;">🍪</div>
+            <h2 id="info-title" style="font-family: 'Fredoka One'; color: var(--accent);"></h2>
+            <p id="info-text" style="margin: 20px 0; line-height: 1.6; font-size: 1.1rem;"></p>
             <button class="btn" onclick="nextPuzzle()">Next Ingredient</button>
         </div>
     </div>
 
     <div id="end-overlay" class="overlay">
         <div class="modal">
-            <h2>🎉 Recipe Complete!</h2>
-            <p>You've successfully baked a safe workplace environment!</p>
-            <div id="final-stats" style="margin: 20px 0; font-weight: bold;"></div>
-            <h3>Top Bakers</h3>
-            <table id="leaderboard-table">
-                <thead><tr><th>Name</th><th>Time</th></tr></thead>
-                <tbody id="leaderboard-body"></tbody>
-            </table>
-            <button class="btn" onclick="location.reload()">Play Again</button>
+            <h2 style="font-family: 'Fredoka One'; font-size: 2.2rem;">Master Baker! 🎉</h2>
+            <p>You have completed the full Recipe for Psychological Safety.</p>
+            <div id="final-stats" style="margin: 20px 0; padding: 15px; background: #fff3e0; border-radius: 15px; font-weight: bold;"></div>
+            <button class="btn" onclick="location.reload()">New Shift (Restart)</button>
         </div>
     </div>
 
     <script>
         const PUZZLES = [
-            { word: "TRUST", type: "rio", info: "Trust allows employees to speak up, share ideas, and report hazards without fear." },
-            { word: "CARE", type: "click", info: "When people care about each other, safety becomes a shared responsibility." },
-            { word: "CALM", type: "sooper", info: "A calm mind identifies risks better than a stressed one." },
-            { word: "TEAM", type: "lemon", info: "Strong teams support one another and create safer workplaces." },
-            { word: "FOCUS", type: "rio", info: "Concentration on the task at hand prevents accidental errors." },
-            { word: "LISTEN", type: "click", info: "Active listening ensures that safety concerns are heard and acted upon." },
-            { word: "RESPECT", type: "sooper", info: "Respect encourages open communication and psychological safety." },
-            { word: "SUPPORT", type: "lemon", info: "Helping colleagues in difficult times builds a resilient safety culture." },
-            { word: "BALANCE", type: "rio", info: "Work-life balance prevents burnout, keeping employees alert and safe." },
-            { word: "SAFETY", type: "click", info: "Safety is not just a rule—it's a mindset we bake into every single day." }
+            { word: "TRUST", info: "Trust allows employees to speak up, share ideas, and report hazards without fear." },
+            { word: "CARE", info: "When people care about each other, safety becomes a shared responsibility." },
+            { word: "CALM", info: "A calm mind identifies risks better than a stressed one." },
+            { word: "TEAM", info: "Strong teams support one another and create safer workplaces." },
+            { word: "FOCUS", info: "Concentration on the task at hand prevents accidental errors." },
+            { word: "LISTEN", info: "Active listening ensures that safety concerns are heard and acted upon." },
+            { word: "RESPECT", info: "Respect encourages open communication and psychological safety." },
+            { word: "SUPPORT", info: "Helping colleagues in difficult times builds a resilient safety culture." },
+            { word: "BALANCE", info: "Work-life balance prevents burnout, keeping employees alert and safe." },
+            { word: "SAFETY", info: "Safety is not just a rule—it's a mindset we bake into every single day." }
         ];
 
-        let currentPuzzleIdx = 0;
+        let currentIdx = 0;
         let score = 0;
-        let startTime, timerInterval;
-        let playerName = "";
+        let startTime;
+        let timerInterval;
         let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        // --- Sound Engine ---
-        function playTone(freq, type, duration) {
+        function playTone(freq, type, duration, vol=0.1) {
             const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            const g = audioCtx.createGain();
             osc.type = type;
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            g.gain.setValueAtTime(vol, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        const sounds = {
-            drop: () => playTone(150, 'sine', 0.1),
-            error: () => playTone(100, 'sawtooth', 0.3),
-            success: () => { playTone(523.25, 'sine', 0.1); setTimeout(() => playTone(659.25, 'sine', 0.1), 100); },
-            finish: () => playTone(880, 'sine', 0.5)
-        };
-
-        // --- Game Logic ---
         function startGame() {
-            playerName = document.getElementById('player-name').value || "Anonymous";
+            const name = document.getElementById('player-name').value;
+            if(!name) return alert("Please enter your name!");
             document.getElementById('start-overlay').style.display = 'none';
             startTime = Date.now();
-            timerInterval = setInterval(updateTimer, 1000);
+            timerInterval = setInterval(() => {
+                document.getElementById('timer').innerText = Math.floor((Date.now()-startTime)/1000) + 's';
+            }, 1000);
             loadPuzzle();
         }
 
-        function updateTimer() {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById('timer').innerText = elapsed + "s";
-        }
-
         function loadPuzzle() {
-            const puzzle = PUZZLES[currentPuzzleIdx];
-            document.getElementById('puzzle-count').innerText = `${currentPuzzleIdx + 1} / ${PUZZLES.length}`;
+            const puzzle = PUZZLES[currentIdx];
+            document.getElementById('puzzle-count').innerText = `${currentIdx + 1} / ${PUZZLES.length}`;
             
-            const slotContainer = document.getElementById('slot-container');
-            const tileContainer = document.getElementById('tile-container');
-            slotContainer.innerHTML = '';
-            tileContainer.innerHTML = '';
+            const sCont = document.getElementById('slot-container');
+            const tCont = document.getElementById('tile-container');
+            sCont.innerHTML = '';
+            tCont.innerHTML = '';
 
             const letters = puzzle.word.split('');
-            const shuffled = [...letters].sort(() => Math.random() - 0.5);
-
-            // Create slots
+            
+            // Create target slots
             letters.forEach((_, i) => {
                 const slot = document.createElement('div');
                 slot.className = 'slot';
                 slot.dataset.index = i;
-                slotContainer.appendChild(slot);
+                sCont.appendChild(slot);
             });
 
-            // Create tiles
-            shuffled.forEach((char, i) => {
+            // Create biscuit tiles - ensuring ALL letters are present
+            letters.forEach((char, i) => {
                 const tile = document.createElement('div');
-                tile.className = `biscuit type-${puzzle.type}`;
+                tile.className = 'biscuit';
                 tile.innerText = char;
                 tile.dataset.letter = char;
-                tile.style.left = (50 + (i * 80)) + 'px';
-                tile.style.top = '20px';
+                tile.dataset.id = i; // Unique ID per tile
                 
-                makeDraggable(tile);
-                tileContainer.appendChild(tile);
+                // Randomly scatter tiles in the lower area
+                const randomX = Math.random() * (tCont.offsetWidth - 80);
+                const randomY = Math.random() * (tCont.offsetHeight - 80);
+                tile.style.left = randomX + 'px';
+                tile.style.top = randomY + 'px';
+                
+                attachDrag(tile);
+                tCont.appendChild(tile);
             });
         }
 
-        function makeDraggable(el) {
-            let posX = 0, posY = 0, initialX = 0, initialY = 0;
+        function attachDrag(el) {
+            let startX, startY, initialLeft, initialTop;
 
-            el.onmousedown = dragStart;
-            el.ontouchstart = dragStart;
-
-            function dragStart(e) {
-                e.preventDefault();
-                const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-                const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-                initialX = clientX;
-                initialY = clientY;
-                const rect = el.getBoundingClientRect();
-                posX = rect.left;
-                posY = rect.top;
+            const onStart = (e) => {
+                const touch = e.type === 'touchstart' ? e.touches[0] : e;
+                startX = touch.clientX;
+                startY = touch.clientY;
+                initialLeft = el.offsetLeft;
+                initialTop = el.offsetTop;
+                el.style.zIndex = 1000;
                 
-                document.onmousemove = dragMove;
-                document.ontouchmove = dragMove;
-                document.onmouseup = dragEnd;
-                document.ontouchend = dragEnd;
-            }
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('touchmove', onMove, {passive: false});
+                document.addEventListener('mouseup', onEnd);
+                document.addEventListener('touchend', onEnd);
+            };
 
-            function dragMove(e) {
-                const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-                const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-                const dx = clientX - initialX;
-                const dy = clientY - initialY;
-                el.style.left = (posX + dx) + 'px';
-                el.style.top = (posY + dy) + 'px';
-                el.style.position = 'fixed';
-            }
+            const onMove = (e) => {
+                e.preventDefault();
+                const touch = e.type === 'touchmove' ? e.touches[0] : e;
+                el.style.left = (initialLeft + (touch.clientX - startX)) + 'px';
+                el.style.top = (initialTop + (touch.clientY - startY)) + 'px';
+            };
 
-            function dragEnd() {
-                document.onmousemove = null;
-                document.ontouchmove = null;
+            const onEnd = () => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('touchmove', onMove);
                 
                 const slots = document.querySelectorAll('.slot');
                 let snapped = false;
 
                 slots.forEach(slot => {
-                    const sRect = slot.getBoundingClientRect();
-                    const tRect = el.getBoundingClientRect();
-                    
-                    if (tRect.left < sRect.right && tRect.right > sRect.left &&
-                        tRect.top < sRect.bottom && tRect.bottom > sRect.top) {
-                        
-                        // Snap to center of slot
-                        el.style.position = 'absolute';
+                    const sR = slot.getBoundingClientRect();
+                    const tR = el.getBoundingClientRect();
+                    const centerX = tR.left + 40;
+                    const centerY = tR.top + 40;
+
+                    if(centerX > sR.left && centerX < sR.right && centerY > sR.top && centerY < sR.bottom) {
                         el.style.left = slot.offsetLeft + 'px';
-                        el.style.top = slot.offsetTop + 'px';
+                        el.style.top = (slot.offsetTop + document.getElementById('slot-container').offsetTop) + 'px';
                         el.dataset.currentSlot = slot.dataset.index;
                         snapped = true;
-                        sounds.drop();
+                        playTone(200, 'sine', 0.1);
                     }
                 });
 
-                if (!snapped) {
-                    el.dataset.currentSlot = -1;
-                }
-                
-                checkWord();
-            }
+                if(!snapped) el.dataset.currentSlot = -1;
+                el.style.zIndex = 10;
+                checkWin();
+            };
+
+            el.addEventListener('mousedown', onStart);
+            el.addEventListener('touchstart', onStart);
         }
 
-        function checkWord() {
-            const puzzle = PUZZLES[currentPuzzleIdx];
+        function checkWin() {
+            const word = PUZZLES[currentIdx].word;
             const tiles = document.querySelectorAll('.biscuit');
-            let formedWord = new Array(puzzle.word.length).fill(null);
+            let currentString = new Array(word.length).fill('_');
 
             tiles.forEach(t => {
-                if (t.dataset.currentSlot !== undefined && t.dataset.currentSlot != -1) {
-                    formedWord[t.dataset.currentSlot] = t.dataset.letter;
-                }
+                const idx = parseInt(t.dataset.currentSlot);
+                if(idx >= 0) currentString[idx] = t.dataset.letter;
             });
 
-            if (formedWord.join('') === puzzle.word) {
+            if(currentString.join('') === word) {
                 score += 10;
                 document.getElementById('score').innerText = score;
-                showSuccess();
+                playTone(500, 'triangle', 0.2);
+                setTimeout(showSuccess, 500);
             }
         }
 
         function showSuccess() {
-            sounds.success();
-            initConfetti();
-            const puzzle = PUZZLES[currentPuzzleIdx];
-            document.getElementById('info-title').innerText = puzzle.word;
-            document.getElementById('info-text').innerText = puzzle.info;
+            confetti();
+            const p = PUZZLES[currentIdx];
+            document.getElementById('info-title').innerText = p.word;
+            document.getElementById('info-text').innerText = p.info;
             document.getElementById('info-overlay').style.display = 'flex';
         }
 
         function nextPuzzle() {
             document.getElementById('info-overlay').style.display = 'none';
-            currentPuzzleIdx++;
-            if (currentPuzzleIdx < PUZZLES.length) {
-                loadPuzzle();
-            } else {
-                endGame();
-            }
+            currentIdx++;
+            if(currentIdx < PUZZLES.length) loadPuzzle();
+            else showEnd();
         }
 
-        function endGame() {
+        function showEnd() {
             clearInterval(timerInterval);
-            sounds.finish();
-            const finalTime = document.getElementById('timer').innerText;
-            document.getElementById('final-stats').innerText = `Name: ${playerName} | Score: ${score} | Time: ${finalTime}`;
-            
-            // Leaderboard Logic
-            let lb = JSON.parse(localStorage.getItem('safetyLB') || '[]');
-            lb.push({ name: playerName, time: parseInt(finalTime) });
-            lb.sort((a, b) => a.time - b.time);
-            lb = lb.slice(0, 5);
-            localStorage.setItem('safetyLB', JSON.stringify(lb));
-
-            const body = document.getElementById('leaderboard-body');
-            body.innerHTML = lb.map(entry => `<tr><td>${entry.name}</td><td>${entry.time}s</td></tr>`).join('');
-            
+            document.getElementById('final-stats').innerText = `Final Score: ${score} | Total Time: ${document.getElementById('timer').innerText}`;
             document.getElementById('end-overlay').style.display = 'flex';
         }
 
-        // --- Confetti Effect ---
-        const canvas = document.getElementById('confetti');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function initConfetti() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = [];
-            for(let i=0; i<100; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    size: Math.random() * 10 + 5,
-                    color: `hsl(${Math.random() * 360}, 70%, 60%)`,
-                    vel: Math.random() * 3 + 2
-                });
+        // Simple Canvas Confetti
+        function confetti() {
+            const c = document.getElementById('confetti');
+            const ctx = c.getContext('2d');
+            c.width = window.innerWidth; c.height = window.innerHeight;
+            let parts = Array.from({length: 80}, () => ({
+                x: Math.random()*c.width, y: -20, 
+                s: Math.random()*10+5, c: `hsl(${Math.random()*360}, 70%, 50%)`,
+                v: Math.random()*3+2
+            }));
+            function draw() {
+                ctx.clearRect(0,0,c.width,c.height);
+                parts.forEach(p => { p.y += p.v; ctx.fillStyle=p.c; ctx.fillRect(p.x,p.y,p.s,p.s); });
+                if(parts[0].y < c.height) requestAnimationFrame(draw);
             }
-            requestAnimationFrame(renderConfetti);
+            draw();
         }
-
-        function renderConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.y += p.vel;
-                ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.size, p.size);
-            });
-            if (particles[0].y < canvas.height) requestAnimationFrame(renderConfetti);
-        }
-
-        window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-
     </script>
 </body>
 </html>
