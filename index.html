@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EBM Safety Biscuit Puzzle</title>
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<title>EBM Biscuit Safety Puzzle</title>
 
 <style>
 
 body{
 font-family:Arial;
-background:#f6efe6;
+background:url("https://www.transparenttextures.com/patterns/food.png");
+background-color:#f3eadf;
 text-align:center;
 padding:20px;
 }
 
 h1{
-color:#3c2b20;
+color:#3b2a1d;
 }
 
 #game{
-max-width:500px;
+max-width:600px;
 margin:auto;
 }
 
@@ -29,57 +29,105 @@ margin:auto;
 display:flex;
 flex-wrap:wrap;
 justify-content:center;
-gap:10px;
-margin:20px 0;
+gap:12px;
+margin:25px 0;
 }
 
 .tile{
-width:70px;
-height:70px;
-background:#d8a15e;
-border-radius:20px;
+
+width:90px;
+height:90px;
+
+background-image:url("https://i.imgur.com/0T9QK0p.png");
+background-size:cover;
+
+border-radius:25px;
+
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:26px;
+
+font-size:28px;
 font-weight:bold;
+
 color:white;
-cursor:pointer;
-box-shadow:0 6px 10px rgba(0,0,0,0.2);
+
+cursor:grab;
+
+box-shadow:0 8px 12px rgba(0,0,0,0.25);
+
+transition:transform .2s;
+
+}
+
+.tile:active{
+transform:scale(1.1);
 }
 
 .slot{
-width:70px;
-height:70px;
-border:2px dashed #caa37d;
-border-radius:20px;
+
+width:90px;
+height:90px;
+
+border:3px dashed #c7a07a;
+
+border-radius:25px;
+
 display:inline-flex;
+
 align-items:center;
 justify-content:center;
-margin:5px;
+
+margin:6px;
+
+background:#fff7ef;
+
 }
 
 #slots{
-margin:15px 0;
+margin:20px 0;
 }
 
 button{
+
 background:#b87333;
+
 border:none;
-padding:12px 20px;
+
+padding:12px 22px;
+
 color:white;
+
 border-radius:30px;
+
 font-size:16px;
+
 cursor:pointer;
-margin-top:10px;
+
 }
 
 #info{
+
 margin-top:10px;
+
 font-weight:bold;
+
+font-size:18px;
+
+}
+
+#message{
+
+margin-top:15px;
+
+font-size:18px;
+
+color:#3b2a1d;
+
 }
 
 </style>
+
 </head>
 
 <body>
@@ -89,9 +137,11 @@ font-weight:bold;
 <div id="game">
 
 <div id="info">
-Puzzle: <span id="level">1</span>/10 |
+
+Puzzle: <span id="level">1</span>/5 |
 Score: <span id="score">0</span> |
-Time: <span id="time">0</span>s
+Total Time: <span id="time">0</span>s
+
 </div>
 
 <div id="slots"></div>
@@ -104,55 +154,61 @@ Time: <span id="time">0</span>s
 
 </div>
 
+<audio id="dropSound">
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_4c3b9c8e6c.mp3">
+</audio>
+
 <script>
 
-const words=[
-"TRUST",
-"CALM",
-"CARE",
-"BALANCE",
-"SUPPORT",
-"RESPECT",
-"SAFETY",
-"FOCUS",
-"TEAM",
-"LISTEN"
+const puzzles=[
+{word:"TRUST",msg:"Trust helps employees speak openly without fear."},
+
+{word:"CARE",msg:"Care creates supportive and respectful workplaces."},
+
+{word:"CALM",msg:"Calm environments reduce stress and improve focus."},
+
+{word:"TEAM",msg:"Strong teams support each other's safety."},
+
+{word:"FOCUS",msg:"Focus prevents mistakes and improves safety."}
+
 ]
 
 let level=0
 let score=0
 let timer=0
-let interval
 
-function startTimer(){
-interval=setInterval(()=>{
+setInterval(()=>{
+
 timer++
+
 document.getElementById("time").innerText=timer
+
 },1000)
-}
 
 function loadPuzzle(){
 
-clearInterval(interval)
-timer=0
-document.getElementById("time").innerText=0
-startTimer()
-
-let word=words[level]
+let word=puzzles[level].word
 
 document.getElementById("level").innerText=level+1
 
 let slotsHTML=""
+
 for(let i=0;i<word.length;i++){
-slotsHTML+=`<div class="slot" data-index="${i}"></div>`
+
+slotsHTML+=`<div class="slot"></div>`
+
 }
+
 document.getElementById("slots").innerHTML=slotsHTML
 
 let shuffled=word.split("").sort(()=>Math.random()-0.5)
 
 let trayHTML=""
+
 shuffled.forEach(letter=>{
+
 trayHTML+=`<div class="tile">${letter}</div>`
+
 })
 
 document.getElementById("tray").innerHTML=trayHTML
@@ -164,14 +220,17 @@ enableDrag()
 function enableDrag(){
 
 let tiles=document.querySelectorAll(".tile")
+
 let slots=document.querySelectorAll(".slot")
 
 tiles.forEach(tile=>{
+
 tile.draggable=true
 
 tile.addEventListener("dragstart",e=>{
+
 e.dataTransfer.setData("text",tile.innerText)
-tile.classList.add("dragging")
+
 })
 
 })
@@ -179,16 +238,25 @@ tile.classList.add("dragging")
 slots.forEach(slot=>{
 
 slot.addEventListener("dragover",e=>{
+
 e.preventDefault()
+
 })
 
 slot.addEventListener("drop",e=>{
+
 e.preventDefault()
+
 let letter=e.dataTransfer.getData("text")
 
 if(slot.innerText===""){
+
 slot.innerText=letter
+
+document.getElementById("dropSound").play()
+
 }
+
 })
 
 })
@@ -200,32 +268,36 @@ function checkWord(){
 let slots=document.querySelectorAll(".slot")
 
 let word=""
+
 slots.forEach(s=>{
+
 word+=s.innerText
+
 })
 
-if(word===words[level]){
+if(word===puzzles[level].word){
 
 score+=10
+
 document.getElementById("score").innerText=score
 
-confetti({
-particleCount:150,
-spread:70,
-origin:{y:0.6}
-})
-
-document.getElementById("message").innerText="Great! Correct word."
+document.getElementById("message").innerText=puzzles[level].msg
 
 level++
 
-if(level<words.length){
-setTimeout(loadPuzzle,1200)
-}else{
-document.getElementById("message").innerText="🎉 You completed the Safety Recipe!"
-}
+if(level<puzzles.length){
+
+setTimeout(loadPuzzle,1500)
 
 }else{
+
+document.getElementById("message").innerText="🎉 You completed the Safety Biscuit Recipe!"
+
+}
+
+}
+
+else{
 
 document.getElementById("message").innerText="Try again."
 
