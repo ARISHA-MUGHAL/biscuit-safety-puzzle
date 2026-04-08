@@ -79,73 +79,227 @@
 
       /* ===== TOP STATUS BAR ===== */
       #status-bar {
-        width: 100%;
-        max-width: 680px;
-        display: none;
-        flex-direction: column;
-        padding: 12px 20px 10px;
-        margin: 14px auto 0;
-        background: rgba(253, 245, 230, 0.94);
-        border-radius: var(--radius);
-        box-shadow:
-          0 4px 20px var(--shadow-warm),
-          inset 0 1px 0 rgba(255, 255, 255, 0.8);
-        border: 1.5px solid rgba(227, 168, 87, 0.35);
-        gap: 8px;
-      }
+  width: min(96vw, 1180px);
+  max-width: 1180px;
+  display: none;
+  flex-direction: column;
+  padding: 14px 24px 12px;
+  margin: 18px auto 0;
+  background: rgba(253, 245, 230, 0.94);
+  border-radius: 22px;
+  box-shadow:
+    0 8px 28px rgba(62,39,35,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.85);
+  border: 1.5px solid rgba(227,168,87,0.35);
+  gap: 10px;
+}
 
-      .status-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-      }
+#game-area {
+  width: min(96vw, 1180px);
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 22px 20px 34px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
 
-      .status-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-        flex: 1;
-      }
+.word-header {
+  text-align: center;
+  max-width: 860px;
+}
 
-      .status-label {
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--brown-light);
-      }
+.word-number {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--gold-dark);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
 
-      .status-value {
-        font-size: 17px;
-        font-weight: 800;
-        color: var(--brown);
-        font-variant-numeric: tabular-nums;
-      }
+.word-hint {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(15px, 2.2vw, 20px);
+  color: var(--brown-light);
+  font-style: italic;
+}
 
-      .status-divider {
-        width: 1px;
-        height: 30px;
-        background: rgba(227, 168, 87, 0.4);
-        flex-shrink: 0;
-      }
+#slot-area {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  padding: 26px 22px;
+  background: rgba(255,255,255,0.58);
+  border-radius: 24px;
+  box-shadow:
+    inset 0 2px 16px rgba(62,39,35,0.06),
+    0 10px 28px rgba(62,39,35,0.08);
+  border: 2px dashed rgba(227,168,87,0.48);
+  min-height: 140px;
+  width: 100%;
+  max-width: 920px;
+  position: relative;
+  transition: border-color 0.2s;
+}
 
-      #progress-track {
-        width: 100%;
-        height: 5px;
-        background: rgba(62, 39, 35, 0.08);
-        border-radius: 10px;
-        overflow: hidden;
-      }
+#tile-area {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  padding: 20px;
+  min-height: 150px;
+  width: 100%;
+  max-width: 980px;
+}
+<div id="learning-panel">
+  <div class="learning-title">Psychological Safety Insight</div>
+  <div id="learning-text">
+    Complete a biscuit word to unlock a workplace learning message.
+  </div>
+</div>
+      #learning-panel {
+  width: 100%;
+  max-width: 920px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.68);
+  border: 1.5px solid rgba(227,168,87,0.28);
+  box-shadow: 0 10px 24px rgba(62,39,35,0.08);
+  text-align: center;
+}
 
-      #progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--gold-dark), var(--gold));
-        border-radius: 10px;
-        transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        width: 0%;
-      }
+.learning-title {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 8px;
+}
+
+#learning-text {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--brown-mid);
+}
+.slot {
+  width: 92px;
+  height: 92px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.55), rgba(244,228,201,0.75));
+  border: 2.5px dashed rgba(227,168,87,0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    transform 0.15s,
+    box-shadow 0.18s;
+  flex-shrink: 0;
+}
+
+.slot.drag-over {
+  border-color: var(--gold);
+  background: rgba(227,168,87,0.15);
+  transform: scale(1.08);
+  box-shadow: 0 0 0 4px rgba(227,168,87,0.22);
+}
+
+.tile {
+  width: 92px;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 31px;
+  font-weight: 900;
+  cursor: grab;
+  user-select: none;
+  border-radius: 18px;
+  transition:
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.18s ease,
+    opacity 0.15s;
+  touch-action: none;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  -webkit-user-select: none;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.tile:hover {
+  transform: translateY(-7px) scale(1.08);
+}
+
+.tile.dragging {
+  opacity: 0.34;
+  cursor: grabbing;
+}
+
+.tile.in-slot {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  cursor: grab;
+}
+
+.tile::before {
+  content: "";
+  position: absolute;
+  inset: 8% 10% auto 10%;
+  height: 24%;
+  border-radius: 999px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.38),
+    rgba(255,255,255,0.08)
+  );
+  filter: blur(1px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(rgba(255,248,230,0.65) 1.2px, transparent 1.3px),
+    radial-gradient(rgba(160,120,60,0.16) 1.2px, transparent 1.3px),
+    radial-gradient(rgba(255,255,255,0.13) 1px, transparent 1.1px);
+  background-size: 18px 18px, 22px 22px, 11px 11px;
+  background-position: 2px 4px, 10px 8px, 5px 6px;
+  opacity: 0.38;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  z-index: 0;
+}
+
+.tile > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ghost-tile {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.95;
+  cursor: grabbing;
+  transform: rotate(-4deg) scale(1.08);
+  box-shadow: 0 22px 50px rgba(0,0,0,0.34) !important;
+  transition: none !important;
+  border-radius: 18px;
+}
 
       /* ===== GAME AREA ===== */
       #game-area {
@@ -292,137 +446,117 @@
 
       /* ===== BISCUIT STYLE A — Rio dark chocolate ===== */
       .rio-biscuit {
-        background:
-          radial-gradient(
-            circle at 30% 30%,
-            rgba(255, 255, 255, 0.08) 0%,
-            transparent 50%
-          ),
-          radial-gradient(#2a1a0e 1.6px, transparent 1.6px),
-          linear-gradient(150deg, #6b3e1f 0%, #4a2c15 45%, #3b2414 100%);
-        background-size:
-          100% 100%,
-          9px 9px,
-          100% 100%;
-        color: #fff;
-        border-radius: 12px;
-        box-shadow:
-          inset 0 3px 8px rgba(255, 255, 255, 0.1),
-          inset 0 -4px 8px rgba(0, 0, 0, 0.45),
-          0 6px 16px rgba(0, 0, 0, 0.28);
-        text-shadow:
-          0 1px 4px rgba(0, 0, 0, 0.55),
-          0 0 8px rgba(255, 255, 255, 0.1);
-        border: 1.5px solid rgba(255, 255, 255, 0.05);
-      }
+  background:
+    radial-gradient(circle at 28% 25%, rgba(255,255,255,0.12), transparent 35%),
+    radial-gradient(circle at 72% 70%, rgba(0,0,0,0.18), transparent 34%),
+    radial-gradient(#2a1a0e 1.7px, transparent 1.8px),
+    linear-gradient(145deg, #7a4a26 0%, #5b3419 40%, #3e2413 100%);
+  background-size: 100% 100%, 100% 100%, 11px 11px, 100% 100%;
+  color: #fff8ef;
+  border-radius: 18px;
+  box-shadow:
+    inset 0 5px 10px rgba(255,255,255,0.1),
+    inset 0 -7px 10px rgba(0,0,0,0.42),
+    inset 2px 2px 6px rgba(255,255,255,0.04),
+    0 10px 18px rgba(62,39,35,0.28);
+  border: 1.5px solid rgba(255,255,255,0.06);
+  text-shadow: 0 2px 6px rgba(0,0,0,0.45);
+}
 
-      /* BISCUIT STYLE B — Click round tea biscuit */
-      .click-biscuit {
-        background: radial-gradient(
-          circle at 35% 28%,
-          #f8d898 0%,
-          #f0c77a 35%,
-          #d39b4a 78%,
-          #b87d30 100%
-        );
-        border-radius: 50%;
-        color: #3e2723;
-        box-shadow:
-          inset 0 4px 8px rgba(255, 255, 255, 0.42),
-          inset 0 -5px 8px rgba(0, 0, 0, 0.2),
-          0 6px 16px rgba(0, 0, 0, 0.2);
-        border: 3px dotted rgba(175, 115, 35, 0.8);
-        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-      }
+.click-biscuit {
+  background:
+    radial-gradient(circle at 35% 28%, #fde3a8 0%, #f4ca7e 34%, #db9f4b 78%, #b67a2f 100%);
+  color: #3e2723;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 6px 10px rgba(255,255,255,0.44),
+    inset 0 -7px 10px rgba(0,0,0,0.2),
+    0 10px 18px rgba(62,39,35,0.2);
+  border: 4px dotted rgba(175,115,35,0.78);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.45);
+}
 
-      /* BISCUIT STYLE C — Sooper glucose stripes */
-      .sooper-biscuit {
-        background: repeating-linear-gradient(
-          0deg,
-          #efc06c 0px,
-          #efc06c 5px,
-          #d9a84f 5px,
-          #d9a84f 10px
-        );
-        border-radius: 8px;
-        color: #3e2723;
-        box-shadow:
-          inset 0 3px 6px rgba(255, 255, 255, 0.3),
-          inset 0 -4px 8px rgba(0, 0, 0, 0.2),
-          0 6px 14px rgba(0, 0, 0, 0.2);
-        border: 2px solid rgba(175, 115, 35, 0.35);
-        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.45);
-      }
+.sooper-biscuit {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #f1c674 0px, #f1c674 7px,
+      #dea958 7px, #dea958 14px
+    );
+  color: #3e2723;
+  border-radius: 14px;
+  box-shadow:
+    inset 0 4px 8px rgba(255,255,255,0.3),
+    inset 0 -6px 9px rgba(0,0,0,0.2),
+    0 10px 18px rgba(62,39,35,0.18);
+  border: 2px solid rgba(175,115,35,0.32);
+}
 
-      /* BISCUIT STYLE D — Lemon sandwich */
-      .lemon-biscuit {
-        background: linear-gradient(
-          150deg,
-          #fffbe8 0%,
-          #fff3c4 45%,
-          #e9d68a 100%
-        );
-        border-radius: 14px;
-        color: #5a4000;
-        box-shadow:
-          inset 0 4px 8px rgba(255, 255, 255, 0.72),
-          inset 0 -5px 8px rgba(0, 0, 0, 0.16),
-          0 6px 16px rgba(0, 0, 0, 0.18);
-        border: 3px solid rgba(210, 178, 90, 0.8);
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
-      }
+.lemon-biscuit {
+  background:
+    linear-gradient(145deg, #fffdf0 0%, #fff3c8 42%, #ead88f 100%);
+  color: #5a4000;
+  border-radius: 20px;
+  box-shadow:
+    inset 0 5px 9px rgba(255,255,255,0.72),
+    inset 0 -6px 9px rgba(0,0,0,0.13),
+    0 10px 18px rgba(62,39,35,0.16);
+  border: 3px solid rgba(210,178,90,0.82);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.78);
+}
 
-      /* BISCUIT STYLE E — Butter dotted */
-      .butter-biscuit {
-        background:
-          radial-gradient(
-            circle at 32% 28%,
-            rgba(255, 255, 255, 0.22) 0%,
-            transparent 58%
-          ),
-          radial-gradient(#dfa040 1.4px, transparent 1.4px),
-          linear-gradient(142deg, #f5c97a 0%, #e8ae5a 52%, #d0913c 100%);
-        background-size:
-          100% 100%,
-          11px 11px,
-          100% 100%;
-        border-radius: 10px;
-        color: #3e2723;
-        box-shadow:
-          inset 0 3px 8px rgba(255, 255, 255, 0.25),
-          inset 0 -4px 8px rgba(0, 0, 0, 0.22),
-          0 6px 16px rgba(0, 0, 0, 0.2);
-        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
-      }
+.butter-biscuit {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,0.2), transparent 54%),
+    radial-gradient(#dc9e42 1.5px, transparent 1.6px),
+    linear-gradient(142deg, #f8cf84 0%, #eab360 54%, #d4903e 100%);
+  background-size: 100% 100%, 13px 13px, 100% 100%;
+  color: #3e2723;
+  border-radius: 16px;
+  box-shadow:
+    inset 0 4px 8px rgba(255,255,255,0.26),
+    inset 0 -6px 9px rgba(0,0,0,0.2),
+    0 10px 18px rgba(62,39,35,0.18);
+}
 
-      /* BISCUIT STYLE F — Hero premium gold (SAFETY) */
-      .hero-biscuit {
-        background:
-          radial-gradient(
-            circle at 28% 22%,
-            rgba(255, 255, 255, 0.32) 0%,
-            transparent 55%
-          ),
-          linear-gradient(
-            132deg,
-            #f7d57a 0%,
-            #e3a857 32%,
-            #c8893a 62%,
-            #a8711f 100%
-          );
-        border-radius: 12px;
-        color: #fff;
-        box-shadow:
-          inset 0 4px 10px rgba(255, 255, 255, 0.32),
-          inset 0 -5px 10px rgba(0, 0, 0, 0.28),
-          0 8px 24px rgba(168, 113, 31, 0.42),
-          0 2px 6px rgba(0, 0, 0, 0.18);
-        border: 2px solid rgba(255, 220, 120, 0.45);
-        text-shadow:
-          0 1px 4px rgba(0, 0, 0, 0.4),
-          0 0 10px rgba(255, 255, 200, 0.25);
-      }
+.hero-biscuit {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255,255,255,0.32), transparent 52%),
+    linear-gradient(132deg, #f8dc8f 0%, #ebb35d 28%, #d19135 60%, #aa6e1f 100%);
+  color: #fff;
+  border-radius: 18px;
+  box-shadow:
+    inset 0 5px 12px rgba(255,255,255,0.28),
+    inset 0 -6px 10px rgba(0,0,0,0.28),
+    0 12px 24px rgba(168,113,31,0.34);
+  border: 2px solid rgba(255,220,120,0.5);
+  text-shadow: 0 2px 6px rgba(0,0,0,0.36);
+}
+/* ===== biscuit powder crumbs ===== */
+      #tile-area::before {
+  content: "";
+  position: absolute;
+  width: min(980px, 100%);
+  height: 150px;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(214,180,120,0.35) 1.5px, transparent 1.6px),
+    radial-gradient(rgba(255,255,255,0.38) 1.2px, transparent 1.3px),
+    radial-gradient(rgba(180,130,70,0.16) 1px, transparent 1.1px);
+  background-size: 26px 26px, 18px 18px, 32px 32px;
+  background-position: 0 0, 13px 8px, 7px 14px;
+  opacity: 0.35;
+  z-index: 0;
+}
 
+#tile-area {
+  position: relative;
+}
+
+#tile-area .tile {
+  position: relative;
+  z-index: 1;
+}
       /* ===== TRY AGAIN ===== */
       #try-again-btn {
         display: none;
