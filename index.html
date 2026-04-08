@@ -1,342 +1,307 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Safety Biscuit Puzzle - 2026 Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #f7ede2;
-            --primary-brown: #5d4037;
-            --rio-top: #e3a857;
-            --rio-dark: #3e2723; 
-            --accent: #d84315;
-            --shadow: rgba(0,0,0,0.15);
+
+    const obj = dragState.obj;
+    dragState = null;
+
+    if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+    obj.el.classList.remove('dragging');
+
+    // Find target slot
+    let targetSlotIdx = -1;
+    for (let i = 0; i < slots.length; i++) {
+      const r = slots[i].el.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+        targetSlotIdx = i;
+        break;
+      }
+    }
+
+    if (targetSlotIdx >= 0 && !slots[targetSlotIdx].tile) {
+      // Place tile in slot
+      placeTileInSlot(obj, targetSlotIdx);
+    } else {
+      // Return tile to tile area if it's not there already
+      const tileArea = document.getElementById('tile-area');
+      if (!tileArea.contains(obj.el)) {
+        tileArea.appendChild(obj.el);
+      }
+      obj.slotIdx = null;
+    }
+  }
+
+  function placeTileInSlot(obj, slotIdx) {
+    const slot = slots[slotIdx];
+    // If something already in tile area, make sure tile is removed from there
+    if (obj.el.parentNode) obj.el.parentNode.removeChild(obj.el);
+
+    slot.el.innerHTML = '';
+    slot.el.appendChild(obj.el);
+    slot.el.classList.add('filled');
+    slot.tile = obj;
+    obj.slotIdx = slotIdx;
+
+    // Style tile in slot
+    obj.el.style.width = '100%';
+    obj.el.style.height = '100%';
+    obj.el.classList.add('snap-in');
+    obj.el.addEventListener('animationend', () => obj.el.classList.remove('snap-in'), { once: true });
+
+    playPlacement();
+
+    // Check if all slots filled
+    const allFilled = slots.every(s => s.tile !== null);
+    if (allFilled) {
+      setTimeout(checkAnswer, 180);
+    }
+  }
+
+  function checkAnswer() {
+    const assembled = slots.map(s => s.tile ? s.tile.letter : '').join('');
+    const target = PUZZLES[currentPuzzle].word;
+
+    if (assembled === target) {
+      // Correct!
+      playSuccess();
+      score += Math.max(10, 100 - (currentPuzzle * 5));
+      document.getElementById('score-display').textContent = score;
+
+      setTimeout(() => showEduModal(currentPuzzle), 400);
+    } else {
+      // Wrong
+      playError();
+      const slotArea = document.getElementById('slot-area');
+      slotArea.classList.add('shake');
+      slotArea.addEventListener('animationend', () => slotArea.classList.remove('shake'), { once: true });
+
+      document.getElementById('try-again-btn').style.display = 'inline-flex';
+    }
+  }
+
+  // ===== TRY AGAIN =====
+  document.getElementById('try-again-btn').addEventListener('click', function() {
+    this.style.display = 'none';
+    resetPuzzle();
+  });
+
+  function resetPuzzle() {
+    // Animate tiles back to tile area
+    const tileArea = document.getElementById('tile-area');
+    slots.forEach(s => {
+      if (s.tile) {
+        const obj = s.tile;
+        s.el.innerHTML = '';
+        s.el.classList.remove('filled');
+        obj.slotIdx = null;
+        obj.el.style.width = '';
+        obj.el.style.height = '';
+        tileArea.appendChild(obj.el);
+        obj.el.classList.add('bounce-in');
+        obj.el.addEventListener('animationend', () => obj.el.classList.remove('bounce-in'), { once: true });
+        s.tile = null;
+      }
+    });
+  }
+
+  // ===== SLOT DROP SETUP (for re-placing tiles between slots) =====
+  function setupSlotDrop(el, idx) {
+    // slots are also draggable targets — handled in endDrag
+  }
+
+  // ===== EDUCATIONAL MODAL =====
+  function showEduModal(puzzleIdx) {
+    const puzzle = PUZZLES[puzzleIdx];
+    document.getElementById('edu-emoji').textContent = puzzle.emoji;
+    document.getElementById('edu-word').textContent = puzzle.word;
+    document.getElementById('edu-text').textContent = puzzle.edu;
+    document.getElementById('edu-badge').textContent = 'Ingredient ' + (puzzleIdx + 1) + ' Unlocked';
+
+    const overlay = document.getElementById('edu-overlay');
+    overlay.style.display = 'flex';
+    requestAnimationFrame(() => {
+      overlay.classList.add('visible');
+    });
+  }
+
+  document.getElementById('edu-continue-btn').addEventListener('click', function() {
+    const overlay = document.getElementById('edu-overlay');
+    overlay.classList.remove('visible');
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      const next = currentPuzzle + 1;
+      if (next < PUZZLES.length) {
+        loadPuzzle(next);
+      } else {
+        gameComplete();
+      }
+    }, 320);
+  });
+
+  // ===== GAME COMPLETE =====
+  function gameComplete() {
+    stopTimer();
+    const timeStr = formatTime(elapsedMs);
+
+    document.getElementById('game-area').style.display = 'none';
+    document.getElementById('status-bar').style.display = 'none';
+    document.getElementById('progress-fill').style.width = '100%';
+
+    document.getElementById('result-name').textContent = player.name;
+    document.getElementById('result-info').textContent = player.dept + ' · ' + player.desig;
+    document.getElementById('result-score').textContent = score;
+    document.getElementById('result-time').textContent = timeStr;
+
+    saveScore(player.name, player.dept, player.desig, elapsedMs, score);
+    renderLeaderboard();
+
+    document.getElementById('completion-screen').style.display = 'block';
+    requestAnimationFrame(() => {
+      launchConfetti();
+    });
+  }
+
+  // ===== LEADERBOARD =====
+  function saveScore(name, dept, desig, ms, sc) {
+    let data = [];
+    try { data = JSON.parse(localStorage.getItem('sbp_leaderboard') || '[]'); } catch(e) {}
+    data.push({ name, dept, desig, ms, score: sc });
+    data.sort((a, b) => a.ms - b.ms);
+    data = data.slice(0, 10);
+    try { localStorage.setItem('sbp_leaderboard', JSON.stringify(data)); } catch(e) {}
+  }
+
+  function renderLeaderboard() {
+    let data = [];
+    try { data = JSON.parse(localStorage.getItem('sbp_leaderboard') || '[]'); } catch(e) {}
+    data.sort((a, b) => a.ms - b.ms);
+    const top5 = data.slice(0, 5);
+    const tbody = document.getElementById('leaderboard-body');
+    tbody.innerHTML = '';
+
+    if (top5.length === 0) {
+      const row = document.createElement('tr');
+      row.innerHTML = '<td colspan="4" style="text-align:center;color:var(--brown-light);padding:20px;">No entries yet. You\'re the first!</td>';
+      tbody.appendChild(row);
+      return;
+    }
+
+    top5.forEach((entry, i) => {
+      const row = document.createElement('tr');
+      const isCurrentPlayer = entry.name === player.name && entry.ms === elapsedMs;
+      if (isCurrentPlayer) row.classList.add('highlight');
+
+      const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-other';
+      row.innerHTML = `
+        <td><span class="rank-badge ${rankClass}">${i + 1}</span></td>
+        <td>${escHtml(entry.name)}</td>
+        <td>${escHtml(entry.dept)} · ${escHtml(entry.desig)}</td>
+        <td>${formatTime(entry.ms)}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ===== PLAY AGAIN =====
+  document.getElementById('play-again-btn').addEventListener('click', function() {
+    score = 0;
+    elapsedMs = 0;
+    startTime = null;
+    currentPuzzle = 0;
+    document.getElementById('score-display').textContent = '0';
+    document.getElementById('timer-display').textContent = '00:00';
+    document.getElementById('progress-fill').style.width = '0%';
+
+    document.getElementById('completion-screen').style.display = 'none';
+    document.getElementById('status-bar').style.display = 'flex';
+    document.getElementById('game-area').style.display = 'flex';
+
+    startTimer();
+    loadPuzzle(0);
+  });
+
+  // ===== CONFETTI =====
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+
+    const colors = ['#E3A857','#3E2723','#FDF5E6','#C8893A','#F7D57A','#6D4C41','#fff','#F5C77A'];
+    const shapes = ['rect','circle','ribbon'];
+
+    const particles = Array.from({ length: 120 }, () => ({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      w: 8 + Math.random() * 10,
+      h: 4 + Math.random() * 8,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      shape: shapes[Math.floor(Math.random() * shapes.length)],
+      vx: (Math.random() - 0.5) * 2.5,
+      vy: 2 + Math.random() * 3.5,
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 0.15,
+      alpha: 1
+    }));
+
+    let frame;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.angle += p.spin;
+        if (p.y > canvas.height + 30) {
+          p.alpha -= 0.02;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
-
-        body {
-            font-family: 'Quicksand', sans-serif;
-            background-color: var(--bg-color);
-            background-image: radial-gradient(#d7ccc8 1px, transparent 1px);
-            background-size: 25px 25px;
-            color: var(--primary-brown);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+        if (p.alpha <= 0) return;
+        alive = true;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        if (p.shape === 'rect') {
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        } else if (p.shape === 'circle') {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.w/2, 0, Math.PI*2);
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.moveTo(-p.w/2, 0);
+          ctx.bezierCurveTo(-p.w/4, -p.h, p.w/4, p.h, p.w/2, 0);
+          ctx.fill();
         }
+        ctx.restore();
+      });
+      if (alive) {
+        frame = requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    draw();
 
-        #header {
-            width: 100%;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 4px 15px var(--shadow);
-            z-index: 100;
-        }
+    // Auto-stop after 6s
+    setTimeout(() => {
+      cancelAnimationFrame(frame);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }, 6000);
+  }
 
-        .stat-box { text-align: center; }
-        .stat-label { font-size: 0.6rem; color: #8d6e63; text-transform: uppercase; }
-        .stat-value { font-size: 1.1rem; font-family: 'Fredoka One', cursive; color: var(--primary-brown); }
+  // ===== RESIZE CANVAS =====
+  window.addEventListener('resize', () => {
+    const canvas = document.getElementById('confetti-canvas');
+    if (canvas.style.display !== 'none') {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+  });
 
-        #game-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-        }
-
-        h1 { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--primary-brown); margin-top: 10px; text-align: center; }
-
-        #slot-container {
-            display: flex;
-            gap: 10px;
-            margin: 30px 0;
-            min-height: 75px;
-            justify-content: center;
-            flex-wrap: wrap;
-            width: 100%;
-        }
-
-        .slot {
-            width: 65px;
-            height: 65px;
-            border: 3px dashed rgba(93, 64, 55, 0.2);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        #tile-area {
-            flex: 1;
-            width: 100%;
-            position: relative;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-        }
-
-        .biscuit {
-            width: 65px;
-            height: 65px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Fredoka One', cursive;
-            font-size: 1.8rem;
-            color: rgba(62, 39, 35, 0.7);
-            cursor: grab;
-            position: absolute;
-            user-select: none;
-            background: var(--rio-top);
-            border-radius: 10px;
-            box-shadow: 0 4px 0 #c6934b, 0 6px 10px rgba(0,0,0,0.2);
-            border: 1px solid #c6934b;
-            z-index: 10;
-        }
-
-        .biscuit::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(var(--rio-dark) 20%, transparent 25%);
-            background-size: 18px 18px;
-            background-position: 5px 5px;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(62, 39, 35, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-
-        .modal {
-            background: #fff;
-            padding: 30px;
-            border-radius: 25px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-weight: 700;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-    </style>
-</head>
-<body>
-
-    <div id="header">
-        <div class="stat-box"><div class="stat-label">Ingredient</div><div class="stat-value" id="puzzle-count">1/10</div></div>
-        <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-        <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="timer">0s</div></div>
-        <button class="btn" style="margin:0; padding: 5px 12px;" onclick="loadPuzzle()">Reset</button>
-    </div>
-
-    <div id="game-container">
-        <h1>Safe Minds Bake Safe Workplaces</h1>
-        <div id="slot-container"></div>
-        <div id="tile-area"></div>
-    </div>
-
-    <div id="start-overlay" class="overlay" style="display: flex;">
-        <div class="modal">
-            <h2>Welcome Baker!</h2>
-            <p>Ready to bake psychological safety?</p>
-            <button class="btn" onclick="startGame()">Start Baking</button>
-        </div>
-    </div>
-
-    <div id="info-overlay" class="overlay">
-        <div class="modal">
-            <h2 id="info-title"></h2>
-            <p id="info-text" style="margin: 15px 0;"></p>
-            <button class="btn" onclick="nextPuzzle()">Next Ingredient</button>
-        </div>
-    </div>
-
-    <script>
-        const PUZZLES = [
-            { word: "TRUST", info: "Trust allows employees to speak up and report hazards without fear." },
-            { word: "CARE", info: "When people care, safety becomes a shared responsibility." },
-            { word: "TEAM", info: "Strong teams support one another for a safer workplace." },
-            { word: "FOCUS", info: "Concentration prevents accidental errors." }
-        ];
-
-        let currentIdx = 0;
-        let score = 0;
-        let startTime;
-        let audioCtx;
-
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        function playSound(freq, type, dur) {
-            initAudio();
-            const osc = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-            osc.connect(g); g.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + dur);
-        }
-
-        function startGame() {
-            initAudio();
-            document.getElementById('start-overlay').style.display = 'none';
-            startTime = Date.now();
-            setInterval(() => {
-                document.getElementById('timer').innerText = Math.floor((Date.now()-startTime)/1000) + 's';
-            }, 1000);
-            loadPuzzle();
-        }
-
-        function loadPuzzle() {
-            const p = PUZZLES[currentIdx];
-            document.getElementById('puzzle-count').innerText = `${currentIdx + 1}/${PUZZLES.length}`;
-            const sCont = document.getElementById('slot-container');
-            const tArea = document.getElementById('tile-area');
-            sCont.innerHTML = '';
-            tArea.innerHTML = '';
-
-            // Create Slots
-            p.word.split('').forEach((_, i) => {
-                const s = document.createElement('div');
-                s.className = 'slot';
-                s.dataset.index = i;
-                sCont.appendChild(s);
-            });
-
-            // Create Biscuits in a Neat Grid (No Overlap)
-            const letters = p.word.split('').sort(() => Math.random() - 0.5);
-            const cols = 3;
-            const gap = 80;
-            
-            letters.forEach((char, i) => {
-                const t = document.createElement('div');
-                t.className = 'biscuit';
-                t.innerText = char;
-                t.dataset.letter = char;
-                
-                // Position in grid
-                const r = Math.floor(i / cols);
-                const c = i % cols;
-                t.style.left = (20 + (c * gap)) + 'px';
-                t.style.top = (20 + (r * gap)) + 'px';
-                
-                attachDrag(t);
-                tArea.appendChild(t);
-            });
-        }
-
-        function attachDrag(el) {
-            let offsetX, offsetY;
-
-            const move = (e) => {
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                el.style.left = (clientX - offsetX) + 'px';
-                el.style.top = (clientY - offsetY) + 'px';
-            };
-
-            const stop = (e) => {
-                document.removeEventListener('mousemove', move);
-                document.removeEventListener('touchmove', move);
-                
-                const slots = document.querySelectorAll('.slot');
-                let snapped = false;
-
-                slots.forEach(slot => {
-                    const sRect = slot.getBoundingClientRect();
-                    const tRect = el.getBoundingClientRect();
-                    
-                    // Check if biscuit center is over slot
-                    const tCenterX = tRect.left + tRect.width/2;
-                    const tCenterY = tRect.top + tRect.height/2;
-
-                    if (tCenterX > sRect.left && tCenterX < sRect.right && 
-                        tCenterY > sRect.top && tCenterY < sRect.bottom) {
-                        
-                        // SNAP TO CENTER
-                        const areaRect = document.getElementById('tile-area').getBoundingClientRect();
-                        el.style.left = (sRect.left - areaRect.left) + 'px';
-                        el.style.top = (sRect.top - areaRect.top) + 'px';
-                        el.dataset.slotIdx = slot.dataset.index;
-                        snapped = true;
-                        playSound(400, 'sine', 0.1); // Drop Sound
-                    }
-                });
-
-                if(!snapped) el.dataset.slotIdx = -1;
-                checkWord();
-            };
-
-            const start = (e) => {
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                const rect = el.getBoundingClientRect();
-                offsetX = clientX - rect.left;
-                offsetY = clientY - rect.top;
-                el.style.zIndex = 1000;
-                document.addEventListener('mousemove', move);
-                document.addEventListener('touchmove', move, {passive: false});
-                document.addEventListener('mouseup', stop);
-                document.addEventListener('touchend', stop);
-            };
-
-            el.addEventListener('mousedown', start);
-            el.addEventListener('touchstart', start);
-        }
-
-        function checkWord() {
-            const word = PUZZLES[currentIdx].word;
-            const tiles = document.querySelectorAll('.biscuit');
-            let currentStr = new Array(word.length).fill('_');
-
-            tiles.forEach(t => {
-                const idx = parseInt(t.dataset.slotIdx);
-                if(idx >= 0) currentStr[idx] = t.dataset.letter;
-            });
-
-            if(currentStr.join('') === word) {
-                playSound(600, 'triangle', 0.3); // Win Sound
-                setTimeout(() => {
-                    const p = PUZZLES[currentIdx];
-                    document.getElementById('info-title').innerText = p.word;
-                    document.getElementById('info-text').innerText = p.info;
-                    document.getElementById('info-overlay').style.display = 'flex';
-                }, 400);
-            }
-        }
-
-        function nextPuzzle() {
-            document.getElementById('info-overlay').style.display = 'none';
-            currentIdx++;
-            if(currentIdx < PUZZLES.length) loadPuzzle();
-            else alert("Campaign Complete! You are a Safety Master!");
-        }
-    </script>
+})();
+</script>
 </body>
-</html> 
+</html>
